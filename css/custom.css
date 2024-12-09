@@ -1,0 +1,33 @@
+body {
+    background-color: rgb(122, 70, 114) !important;
+    background-image: none;
+}
+
+.bg-faded {
+    background-color: rgb(243, 243, 227);
+}
+
+.cta {
+    background-color: rgb(164, 108, 156);
+}
+
+#mainNav {
+    background-color: rgb(67, 46, 39);   
+}
+
+footer {
+    background-color: rgb(67, 46, 39);
+}
+
+.navbar-nav .nav-link {
+    color: blue;
+}
+
+.about-heading-img {
+    width: 74.5%;
+    height: 400px;
+    object-fit: cover;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}

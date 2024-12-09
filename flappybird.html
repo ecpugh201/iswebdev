@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Flappy Bird Game</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: #5eaecb; /* Darker blue for the main screen */
+      text-align: center;
+      font-family: Arial, sans-serif;
+    }
+
+    canvas {
+      background-color: #70c5ce; /* Lighter blue for the game area */
+      display: block;
+      margin: 20px auto;
+      border: 5px solid #5eaecb; /* Matches the outer background */
+      box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
+    }
+
+    #title {
+      font-size: 30px;
+      font-weight: bold;
+      margin: 20px;
+      color: white;
+      text-shadow: 1px 1px 2px black;
+    }
+
+    #startButton, #replayButton {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      padding: 10px 20px;
+      font-size: 20px;
+      color: white;
+      background-color: #4CAF50;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      display: none;
+    }
+
+    #startButton:hover, #replayButton:hover {
+      background-color: #45a049;
+    }
+
+    #gameOverMessage {
+      font-size: 24px;
+      font-weight: bold;
+      color: red;
+      display: none;
+      position: absolute;
+      top: 40%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
+
+    #backButton, #travelButton {
+      position: absolute;
+      left: 10px;
+      padding: 8px 16px;
+      font-size: 14px;
+      color: white;
+      background-color: #007BFF;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      text-decoration: none;
+    }
+
+    #backButton:hover, #travelButton:hover {
+      background-color: #0056b3;
+    }
+
+    /* Adjust the spacing between the two buttons */
+    #backButton {
+      top: 10px; /* Keeps the back button at the top */
+    }
+
+    #travelButton {
+      top: 50px; /* Adjusts the second button further down */
+    }
+  </style>
+</head>
+<body>
+  <!-- Existing "Go back to more page" button -->
+  <a id="backButton" href="more.html">Go Back to More Page</a>
+
+  <!-- New "Go back to travel page" button -->
+  <a id="travelButton" href="scratch.html">Go Back to Travel Page</a>
+
+  <div id="title">Flappy Bird</div>
+  <canvas id="gameCanvas" width="400" height="600"></canvas>
+  <div id="gameOverMessage">Game Over! Try Again?</div>
+  <button id="startButton">Play</button>
+  <button id="replayButton">Replay</button>
+
+  <script>
+    const canvas = document.getElementById("gameCanvas");
+    const ctx = canvas.getContext("2d");
+
+    const startButton = document.getElementById("startButton");
+    const replayButton = document.getElementById("replayButton");
+    const gameOverMessage = document.getElementById("gameOverMessage");
+
+    const bird = {
+      x: 50,
+      y: canvas.height / 2,
+      width: 20,
+      height: 20,
+      gravity: 0.4,
+      lift: -6,
+      velocity: 0,
+      update: function() {
+        this.velocity += this.gravity;
+        this.y += this.velocity;
+
+        // Prevent the bird from going off the screen at the top
+        if (this.y < 0) {
+          this.y = 0;
+          this.velocity = 0;
+        }
+      },
+      flap: function() {
+        this.velocity = this.lift;
+      },
+      draw: function() {
+        ctx.fillStyle = "yellow";
+        ctx.fillRect(this.x, this.y, this.width, this.height);
+      }
+    };
+
+    const pipes = [];
+    const pipeWidth = 40;
+    const pipeGap = 150;
+    let pipeSpeed = 3;
+    let score = 0;
+    let isGameRunning = false;
+    let pipeInterval;
+
+    function createPipe() {
+      const gapPosition = Math.floor(Math.random() * (canvas.height - pipeGap));
+      pipes.push({
+        x: canvas.width,
+        top: gapPosition,
+        bottom: gapPosition + pipeGap
+      });
+    }
+
+    function updatePipes() {
+      for (let i = 0; i < pipes.length; i++) {
+        pipes[i].x -= pipeSpeed;
+
+        // Remove pipes that have gone off the screen
+        if (pipes[i].x + pipeWidth <= 0) {
+          pipes.splice(i, 1);
+          score++;
+        }
+      }
+    }
+
+    function drawPipes() {
+      for (let i = 0; i < pipes.length; i++) {
+        ctx.fillStyle = "green";
+        ctx.fillRect(pipes[i].x, 0, pipeWidth, pipes[i].top);
+        ctx.fillRect(pipes[i].x, pipes[i].bottom, pipeWidth, canvas.height - pipes[i].bottom);
+      }
+    }
+
+    function drawScore() {
+      ctx.fillStyle = "black";
+      ctx.font = "20px Arial";
+      ctx.fillText("Score: " + score, 10, 30);
+    }
+
+    function checkCollisions() {
+      for (let i = 0; i < pipes.length; i++) {
+        if (
+          bird.x + bird.width > pipes[i].x &&
+          bird.x < pipes[i].x + pipeWidth &&
+          (bird.y < pipes[i].top || bird.y + bird.height > pipes[i].bottom)
+        ) {
+          return true;
+        }
+      }
+
+      // End the game if the bird hits the ground
+      if (bird.y >= canvas.height - bird.height) {
+        return true;
+      }
+
+      return false;
+    }
+
+    function resetGame() {
+      bird.y = canvas.height / 2;
+      bird.velocity = 0;
+      pipes.length = 0;
+      score = 0;
+      isGameRunning = false;
+    }
+
+    function gameLoop() {
+      if (!isGameRunning) return;
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      bird.update();
+      bird.draw();
+
+      updatePipes();
+      drawPipes();
+
+      drawScore();
+
+      if (checkCollisions()) {
+        endGame();
+      } else {
+        requestAnimationFrame(gameLoop);
+      }
+    }
+
+    function startGame() {
+      resetGame();
+      isGameRunning = true;
+      gameOverMessage.style.display = "none";
+      replayButton.style.display = "none";
+      startButton.style.display = "none";
+
+      pipeInterval = setInterval(createPipe, 2000); // Start generating pipes every 2 seconds
+      gameLoop(); // Start the game loop
+    }
+
+    function endGame() {
+      isGameRunning = false;
+      clearInterval(pipeInterval);
+      gameOverMessage.style.display = "block";
+      replayButton.style.display = "block";
+    }
+
+    document.addEventListener("keydown", function(event) {
+      if (event.code === "Space" && isGameRunning) {
+        bird.flap();
+      }
+    });
+
+    startButton.addEventListener("click", startGame);
+    replayButton.addEventListener("click", startGame);
+
+    // Display the start button initially
+    startButton.style.display = "block";
+  </script>
+</body>
+</html>

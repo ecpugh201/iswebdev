@@ -1,0 +1,61 @@
+.mainfont {
+    font-family: serif;
+}
+
+.fontcolor {
+    color: rgb(41, 40, 40);
+}
+
+body {
+    background-color: rgb(194,216, 248);
+}
+
+.mainimgheight {
+    height: 500px;
+}
+
+.imgheight {
+    height: 400px;
+}
+
+.youtubevid {
+    height: 315px;
+    width: 560px;
+    flex-shrink: 0;
+}
+
+.youtubecontainer {
+    display: flex;
+    justify-content: flex-start;
+    gap: 20px;
+}
+
+.tableauchart {
+    transform: scale(0.7);
+    transform-origin: 0 0;
+    margin-bottom: 0 !important;
+    padding-bottom: 0 !important;
+    display: block;
+}
+
+.tableauplaceholder {
+    display: block;
+    margin: 0 !important;
+    padding: 0 !important;
+    height: auto;
+}
+
+.footer {
+    background-color: rgb(120, 171, 248);
+    color: rgb(41, 40, 40);
+    text-align: center;
+    padding: 10px;
+    position: relative;
+    bottom: 0;
+    width: 100%;
+    font-size: 16px;
+}
+
+.footer p {
+    margin: 0;
+}
